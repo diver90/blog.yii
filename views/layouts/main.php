@@ -1,6 +1,7 @@
 <?php
 
 /* @var $this \yii\web\View */
+
 /* @var $content string */
 
 use app\widgets\Alert;
@@ -35,29 +36,37 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
+
+    $menuLinks = [
+        ['label' => 'Home', 'url' => ['/site/index']],
+        ['label' => 'Blog', 'url' => ['/post/blog']]
+    ];
+
+    if (Yii::$app->user->isGuest) {
+        $menuLinks[] = ['label' => 'Login / Sign Up', 'url' => ['/site/login']];
+
+    } else {
+        $menuLinks[] = ['label' => 'Add Post', 'url' => ['/user/add-post']];
+        $menuLinks[] =
+            '<li>'
+            . Html::beginForm(['/site/logout'], 'post')
+            . Html::submitButton(
+                'Logout (' . Yii::$app->user->identity->username . ')',
+                ['class' => 'btn btn-link logout']
+            )
+            . Html::endForm()
+            . '</li>';
+    };
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            Yii::$app->user->isGuest ? (
-                ['label' => 'Login / Sign Up', 'url' => ['/site/login']]
-            ) : (
-                '<li>'
-                . Html::beginForm(['/site/logout'], 'post')
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'btn btn-link logout']
-                )
-                . Html::endForm()
-                . '</li>'
-            )
-        ],
+        'items' => $menuLinks,
     ]);
     NavBar::end();
     ?>
 
     <div class="container">
         <?= Breadcrumbs::widget([
+            'homeLink' => ['url' => '/?r=post/blog', 'label' => 'Blog'],
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
         <?= Alert::widget() ?>
